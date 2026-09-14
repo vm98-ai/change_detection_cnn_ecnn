@@ -34,7 +34,7 @@ Full sweep: `outputs/rotation_robustness.json`. Qualitative comparison figure: `
 
 ## Dataset
 
-[S1GFloods]([https://github.com/](https://github.com/Tamer-Saleh/S1GFlood-Detection)) — real Sentinel-1 SAR flood-mapping change-detection pairs.
+[S1GFloods](https://github.com/Tamer-Saleh/S1GFlood-Detection) — real Sentinel-1 SAR flood-mapping change-detection pairs.
 
 ```
 <DATA_ROOT>/train/{A,B,GT}/*.png   pre-flood / post-flood / binary mask
