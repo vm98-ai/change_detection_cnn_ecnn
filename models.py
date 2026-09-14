@@ -90,13 +90,8 @@ class EquivariantCNN(nn.Module):
             eq_block(t2, t3),
         )
 
-        # Fusion head operates on concatenated (A, B) equivariant features.
         fused_in_type = enn.FieldType(self.gspace, 2 * fields[2] * [self.gspace.regular_repr])
         fused_mid_type = enn.FieldType(self.gspace, fields[1] * [self.gspace.regular_repr])
-        # Final layer maps to the trivial representation: a genuine scalar
-        # field. This is still an equivariant map (rotating the input
-        # rotates *where* each scalar value ends up), which is exactly what
-        # we want for a per-pixel probability mask.
         out_type = enn.FieldType(self.gspace, [self.gspace.trivial_repr])
 
         self.head = enn.SequentialModule(
@@ -113,8 +108,6 @@ class EquivariantCNN(nn.Module):
         fa = self._encode(a)
         fb = self._encode(b)
         fused_tensor = torch.cat([fa.tensor, fb.tensor], dim=1)
-        # Concatenating two GeometricTensors of the same FieldType along the
-        # channel dimension doubles the list of per-field representations.
         fused_type = enn.FieldType(self.gspace, self.out_encoder_type.representations * 2)
         fused = enn.GeometricTensor(fused_tensor, fused_type)
         out = self.head(fused)
@@ -126,19 +119,6 @@ class EquivariantCNN(nn.Module):
 
 def build_models():
     baseline = BaselineCNN(base_ch=16)
-    # fields=(13, 19, 19) chosen (see models.py __main__ sweep) to bring the
-    # equivariant model's parameter count close to the baseline's ~33k, with
-    # the head's first layer at kernel_size=3 to match the baseline's head
-    # (an earlier version of this file used kernel_size=1 in the equivariant
-    # head only, which silently gave it less receptive field than the
-    # baseline right at the A/B fusion step -- an unfair, non-obvious
-    # capacity disadvantage that had nothing to do with the rotation
-    # equivariance itself. Fixed here; field widths re-tuned accordingly.
-    # A naive "same raw channel width" choice (4, 8, 8) looked matched on
-    # paper but actually gave the equivariant model 9x FEWER parameters,
-    # because weight sharing forced by the rotation constraint prunes the
-    # convolution basis. That would have made any performance gap
-    # uninterpretable, so the field widths were corrected here.
     equiv = EquivariantCNN(fields=(13, 19, 19))
     return baseline, equiv
 
