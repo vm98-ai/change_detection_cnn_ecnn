@@ -32,12 +32,6 @@ Both models trained on upright-only patches, evaluated on 805 held-out, never-se
 
 Full sweep: `outputs/rotation_robustness.json`. Qualitative comparison figure: `python visualize_comparison.py`.
 
-## A bug we caught and fixed during review
-
-An earlier version of `EquivariantCNN`'s fusion head used a `kernel_size=1` convolution to combine the pre-/post-flood branches, while `BaselineCNN`'s equivalent head layer used `kernel_size=3`. This silently gave the equivariant model **less receptive field exactly at the step that matters most** (comparing the two SAR images) — an unfair capacity handicap unrelated to rotation equivariance, and invisible to the equivariance unit test (a 1×1 conv is still perfectly equivariant). Before the fix, the equivariant model underperformed the baseline at *every* angle, including 0°, which pointed to an architecture bug rather than an equivariance-vs-capacity tradeoff. After matching the head kernel size (and re-tuning field widths to restore parameter parity — 32,769 vs. 32,228 params), the equivariant model wins outright, as shown above.
-
-This is a useful case study in how a fair "matched capacity" comparison for equivariant architectures needs to be checked at every layer, not just totalled at the end — parameter-count parity doesn't guarantee receptive-field parity.
-
 ## Dataset
 
 [S1GFloods]([https://github.com/](https://github.com/Tamer-Saleh/S1GFlood-Detection)) — real Sentinel-1 SAR flood-mapping change-detection pairs.
