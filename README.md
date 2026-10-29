@@ -1,8 +1,7 @@
 # Rotation-Equivariant SAR Flood Change Detection
 
-Does baking exact rotation symmetry into a CNN's architecture actually make it more robust to rotated inputs than a plain CNN of matched capacity — on **real** Sentinel-1 SAR flood-mapping data, not synthetic benchmarks?
 
-This project trains two Siamese change-detection networks with matched parameter counts on the [S1GFloods](https://github.com/) benchmark (Sentinel-1 SAR pre/post-flood image pairs) and measures how each holds up when the input scene is rotated at test time, despite both models only ever seeing upright (0°) training patches.
+This project trains two Siamese change-detection networks on the [S1GFloods](https://github.com/) benchmark (Sentinel-1 SAR pre/post-flood image pairs) and measures how each holds up when the input scene is rotated at test time, despite both models only ever seeing upright (0°) training patches.
 
 - **BaselineCNN** — ordinary `nn.Conv2d` layers, no rotation symmetry.
 - **EquivariantCNN** — [e2cnn](https://github.com/QUVA-Lab/e2cnn) steerable convolutions built on the C4 group, giving it an *exact, mathematically guaranteed* 90°/180°/270° rotation equivariance.
