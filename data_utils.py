@@ -18,24 +18,6 @@ as, and what the example subset already used):
     <DATA_ROOT>/test/{A,B,GT}/*.png
 
 Any of .png/.jpg/.jpeg/.tif/.tiff is accepted for the image files.
-
-IMPORTANT DESIGN NOTE (flaw caught during review, first pass):
-Patches must never be drawn from more than one split for the same
-underlying scene. We only patchify train and val images. Test images are
-always evaluated whole, at native resolution, so test numbers reflect
-performance on entire real scenes rather than on patches that were seen
-(overlapping) during training.
-
-SECOND FLAW CAUGHT WHEN SCALING TO THE FULL DATASET:
-The original implementation eagerly extracted every stride-32 patch from
-every scene into a Python list at dataset-construction time. That is fine
-for 10 example scenes (~300 patches) but is a correctness AND memory bug at
-full scale: 4,300 scenes x ~49 overlapping 64x64 patches each x 3 arrays
-(A, B, GT) x float32 works out to roughly 10+ GB of RAM before training
-even starts, and takes minutes of up-front CPU time to extract. The dataset
-below now auto-switches to an on-the-fly random-crop sampling mode once the
-scene count crosses a threshold, so scaling from 10 scenes to 5,360 scenes
-does not require the person to change anything.
 """
 
 import glob
